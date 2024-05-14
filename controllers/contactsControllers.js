@@ -56,9 +56,9 @@ export const createContact = (req, res) => {
     abortEarly: false,
   });
   if (typeof error !== "undefined") {
-    return res
-      .status(400)
-      .send(error.details.map((error) => error.message).join(", "));
+    return res.status(400).json({
+      message: error.details.map((error) => error.message).join(", "),
+    });
   }
   contactsService
     .addContact(value.name, value.email, value.phone)
@@ -85,11 +85,13 @@ export const updateContact = (req, res) => {
       .status(400)
       .json({ message: "Body must have at least one field" });
   }
-  const { error } = schema.updateContactSchema.validate(updateContact);
+  const { error } = schema.updateContactSchema.validate(updateContact, {
+    abortEarly: false,
+  });
   if (typeof error !== "undefined") {
-    return res
-      .status(400)
-      .send(error.details.map((error) => error.message).join(", "));
+    return res.status(400).json({
+      message: error.details.map((error) => error.message).join(", "),
+    });
   }
   contactsService
     .updateContact(id, updateContact)
