@@ -19,7 +19,6 @@ export const getOneContact = (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "Invalid ID format" });
   }
-
   contactsService
     .getContactById(id)
     .then((contact) => {
@@ -37,8 +36,12 @@ export const getOneContact = (req, res) => {
 };
 
 export const deleteContact = (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid ID format" });
+  }
   contactsService
-    .removeContact(req.params.id)
+    .removeContact(id)
     .then((contact) => {
       if (contact) {
         res.status(200).json(contact);
@@ -86,8 +89,10 @@ export const createContact = (req, res) => {
 
 export const updateContact = (req, res) => {
   const updateContact = req.body;
-  const id = req.params.id;
-
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid ID format" });
+  }
   if (Object.keys(updateContact).length === 0) {
     return res
       .status(400)
