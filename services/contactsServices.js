@@ -1,19 +1,23 @@
 import Contact from "../models/contact.js";
 
-async function listContacts() {
-  return await Contact.find();
+async function listContacts(ownerId, filter) {
+  const query = { owner: ownerId };
+  if (filter && filter.favorite !== undefined) {
+    query.favorite = filter.favorite;
+  }
+  return await Contact.find(query);
 }
 
-async function getContactById(contactId) {
-  return await Contact.findById(contactId);
+async function getContactById(contactId, ownerId) {
+  return await Contact.findOne({ _id: contactId, owner: ownerId });
 }
 
 async function removeContact(contactId) {
   return await Contact.findByIdAndDelete(contactId);
 }
 
-async function addContact(name, email, phone, favorite) {
-  const newContact = new Contact({ name, email, phone, favorite });
+async function addContact(name, email, phone, favorite, owner) {
+  const newContact = new Contact({ name, email, phone, favorite, owner });
   await newContact.save();
   return newContact;
 }

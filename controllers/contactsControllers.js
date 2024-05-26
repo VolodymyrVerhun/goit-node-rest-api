@@ -4,8 +4,16 @@ import contactsService from "../services/contactsServices.js";
 import schema from "../schemas/contactsSchemas.js";
 
 export const getAllContacts = (req, res) => {
+  const { favorite } = req.query;
+  console.log(favorite);
+  const userId = req.user.id;
+
+  let filter = {};
+  if (favorite !== undefined) {
+    filter.favorite = favorite === "true";
+  }
   contactsService
-    .listContacts()
+    .listContacts(userId, filter)
     .then((contacts) => res.status(200).json(contacts))
     .catch((error) => {
       res
@@ -20,7 +28,7 @@ export const getOneContact = (req, res) => {
     return res.status(400).json({ message: "Invalid ID format" });
   }
   contactsService
-    .getContactById(id)
+    .getContactById(id, req.user.id)
     .then((contact) => {
       if (contact) {
         res.status(200).json(contact);
@@ -62,7 +70,9 @@ export const createContact = (req, res) => {
     email: req.body.email,
     phone: req.body.phone,
     favorite: req.body.favorite,
+    owner: req.user.id,
   };
+
   const { error, value } = schema.createContactSchema.validate(newContact, {
     abortEarly: false,
   });
@@ -72,7 +82,13 @@ export const createContact = (req, res) => {
     });
   }
   contactsService
-    .addContact(value.name, value.email, value.phone, value.favorite)
+    .addContact(
+      value.name,
+      value.email,
+      value.phone,
+      value.favorite,
+      value.owner
+    )
     .then((contact) => {
       if (contact) {
         res.status(201).json(contact);
