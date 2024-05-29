@@ -2,9 +2,19 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/auth.js";
 import schema from "../schemas/contactsSchemas.js";
+
 async function register(req, res, next) {
   try {
     const { email, password } = req.body;
+
+    const { error } = schema.registerSchema.validate({ email, password });
+
+    if (error) {
+      return res.status(400).json({
+        message: error.details.map((detail) => detail.message).join(", "),
+      });
+    }
+
     const newUser = await User.findOne({ email });
     if (newUser !== null) {
       return res.status(409).send({ message: "User already registered" });

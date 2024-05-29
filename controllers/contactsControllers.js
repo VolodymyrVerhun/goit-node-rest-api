@@ -5,7 +5,7 @@ import schema from "../schemas/contactsSchemas.js";
 
 export const getAllContacts = (req, res) => {
   const { favorite } = req.query;
-  console.log(favorite);
+
   const userId = req.user.id;
 
   let filter = {};
@@ -49,7 +49,7 @@ export const deleteContact = (req, res) => {
     return res.status(400).json({ message: "Invalid ID format" });
   }
   contactsService
-    .removeContact(id)
+    .removeContact(id, req.user.id)
     .then((contact) => {
       if (contact) {
         res.status(200).json(contact);
@@ -106,6 +106,7 @@ export const createContact = (req, res) => {
 export const updateContact = (req, res) => {
   const updateContact = req.body;
   const { id } = req.params;
+
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "Invalid ID format" });
   }
@@ -123,7 +124,7 @@ export const updateContact = (req, res) => {
     });
   }
   contactsService
-    .updateContact(id, updateContact)
+    .updateContact(id, updateContact, req.user.id)
     .then((contact) => {
       if (contact) {
         res.status(200).json(contact);
@@ -162,7 +163,7 @@ export const updateStatusContact = (req, res) => {
     });
   }
   contactsService
-    .updateStatusContact(id, updateStatus)
+    .updateStatusContact(id, updateStatus, req.user.id)
     .then((contact) => {
       if (contact) {
         res.status(200).json(contact);
