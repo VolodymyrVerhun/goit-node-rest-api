@@ -6,6 +6,7 @@ const usersRouter = express.Router();
 const jsonParser = express.json();
 
 import authMiddleware from "../middlewares/auth.js";
+import uploadMiddleware from "../middlewares/upload.js";
 
 usersRouter.post("/register", jsonParser, authControllers.register);
 usersRouter.post("/login", jsonParser, authControllers.login);
@@ -21,6 +22,12 @@ usersRouter.patch(
   authMiddleware,
   jsonParser,
   authControllers.updateSubscription
+);
+usersRouter.patch(
+  "/avatars",
+  authMiddleware,
+  uploadMiddleware.single("avatar"),
+  authControllers.changeAvatar
 );
 
 export default usersRouter;
