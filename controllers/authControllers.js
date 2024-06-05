@@ -145,6 +145,10 @@ async function updateSubscription(req, res, next) {
 
 async function changeAvatar(req, res, next) {
   try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file provided" });
+    }
+
     const { filename, path: tmpPath } = req.file;
     const newFilePath = path.resolve("public", "avatars", filename);
 
