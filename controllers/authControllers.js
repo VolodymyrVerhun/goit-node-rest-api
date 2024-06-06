@@ -150,18 +150,19 @@ async function changeAvatar(req, res, next) {
     }
 
     const { filename, path: tmpPath } = req.file;
-    const newFilePath = path.resolve("public", "avatars", filename);
+    const newFileName = `${req.user.id}_${filename}`;
+    const newFilePath = path.resolve("public", "avatars", newFileName);
 
     const image = await jimp.read(tmpPath);
     await image.resize(250, 250).writeAsync(newFilePath);
 
     await fs.unlink(tmpPath);
 
+    const avatarURL = `/avatars/${newFileName}`;
+
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      {
-        avatarURL: req.file.filename,
-      },
+      { avatarURL },
       { new: true }
     );
     res.status(200).json({
